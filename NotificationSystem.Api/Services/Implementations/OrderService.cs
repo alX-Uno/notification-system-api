@@ -24,8 +24,7 @@ public class OrderService(AppDbContext context, INotificationService notificatio
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(ct);
 
-        // Notificación en background: no bloquea la respuesta al cliente.
-        _ = Task.Run(() => _notificationService.SendOrderNotificationAsync(order, CancellationToken.None));
+        await _notificationService.SendOrderNotificationAsync(order, CancellationToken.None);
 
         return order;
     }

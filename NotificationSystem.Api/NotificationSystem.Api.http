@@ -16,6 +16,16 @@ Content-Type: application/json
 Authorization: Bearer {{login.response.body.token}}
 
 {
-  "customerName": "Funciona",
-  "totalAmount": 50.99
+  "customerName": "Otra prueba",
+  "totalAmount": 59.11
 }
+
+### Obtener orden por ID
+GET {{baseUrl}}/api/orders/1e02c8e7-a156-4750-8948-8ca002ba4c3e
+Authorization: Bearer {{login.response.body.token}}
+
+### Obtener todas las órdenes
+GET {{baseUrl}}/api/orders?page=1&pageSize=10
+Authorization: Bearer {{login.response.body.token}}
+
+
