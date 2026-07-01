@@ -24,20 +24,20 @@ API .NET 10 para gestión de órdenes y envío simulado de notificaciones.
 
 ## Paso a paso
 
-1. Clona el repo
+1. Clonar el repo:
 
 ```bash
 git clone https://github.com/alX-Uno/notification-system-api.git
 cd notification-system-api
 ```
 
-2. Levanta SQL Server (desde la raíz del repo)
+2. Levantar SQL Server (desde la raíz del repo):
 
 ```bash
 docker compose up -d
 ```
 
-El docker-compose.yml preconfigura un contenedor `sqlserver_dev` escuchando en el puerto `1433`. La contraseña usada en el compose es `TuPassword123!` (ajústala si cambias el compose).
+El docker-compose.yml preconfigura un contenedor `sqlserver_dev` escuchando en el puerto `1433`. La contraseña usada en el compose es `TuPassword123!`.
 
 3. Registrar user-secrets (desde la carpeta del proyecto)
 
@@ -45,7 +45,7 @@ El docker-compose.yml preconfigura un contenedor `sqlserver_dev` escuchando en e
 cd NotificationSystem.Api
 ```
 
-Si aún no tienes `dotnet user-secrets` (normalmente viene con el SDK), añade los valores locales:
+Si aún no se tiene `dotnet user-secrets`, añadir los valores locales:
 
 ```powershell
 dotnet user-secrets set "Notification:SimulatedDelayMs" "500"
@@ -62,15 +62,13 @@ dotnet user-secrets set "Auth:Username" "admin"
 dotnet user-secrets set "Auth:Password" "Password123$"
 ```
 
-Verifica:
+Verificar:
 
 ```powershell
 dotnet user-secrets list
 ```
 
-> Nota: `UserSecretsId` está en NotificationSystem.Api.csproj. Los secrets se almacenan localmente por usuario y no se suben al repo.
-
-4. (Opcional) Instalar `dotnet-ef` si no lo tienes:
+4. Instalar `dotnet-ef` si no se tiene:
 
 ```bash
 dotnet tool install --global dotnet-ef
