@@ -31,15 +31,15 @@ namespace NotificationSystem.Api.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 50,
-            CancellationToken ct = default)
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken ct = default)
         {
             if (page < 1 || pageSize < 1 || pageSize > 200)
                 return BadRequest("page size must be between 1 and 200");
 
             var list = await _svc.GetAllAsync(page, pageSize, ct);
-            return Ok(list.Select(o => o.AsDto()));
+            return Ok(list);
         }
     }
 }

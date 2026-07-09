@@ -24,25 +24,36 @@ public class OrderService(AppDbContext context, INotificationService notificatio
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(ct);
 
-        await _notificationService.SendOrderNotificationAsync(order, CancellationToken.None);
+        // Mismo ct, para que si el user cancela la request, se cancele también el envío de notificaciones
+        await _notificationService.SendOrderNotificationAsync(order, ct);
 
         return order;
     }
 
     public async Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         return await _context.Orders
+            .AsNoTracking()
             .Include(o => o.NotificationAttempts)
             .FirstOrDefaultAsync(o => o.Id == id, ct);
     }
 
-    public async Task<IEnumerable<Order>> GetAllAsync(int page = 1, int pageSize = 50, CancellationToken ct = default)
+    public async Task<IReadOnlyList<OrderDto>> GetAllAsync(int page = 1, int pageSize = 50, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         return await _context.Orders
-            .Include(o => o.NotificationAttempts)
+            .AsNoTracking()
             .OrderByDescending(o => o.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(o => new OrderDto(
+                o.Id,
+                o.CustomerName,
+                o.TotalAmount,
+                o.CreatedAt))
             .ToListAsync(ct);
     }
 }

@@ -16,8 +16,8 @@ Content-Type: application/json
 Authorization: Bearer {{login.response.body.token}}
 
 {
-  "customerName": "Otra prueba",
-  "totalAmount": 59.11
+  "customerName": "Esta es la tercera prueba",
+  "totalAmount": 51.10
 }
 
 ### Obtener orden por ID

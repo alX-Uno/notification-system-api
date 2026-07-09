@@ -8,39 +8,49 @@ using Microsoft.IdentityModel.Tokens;
 using NotificationSystem.Api.Models.Dtos;
 using NotificationSystem.Api.Models.Options;
 
-[ApiController]
-[Route("api/auth")]
-public class AuthController(IConfiguration config, IOptions<JwtOptions> jwtOptions) : ControllerBase
+namespace NotificationSystem.Api.Controllers
 {
-    private readonly IConfiguration _config = config;
-    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-
-    [HttpPost("login")]
-    public ActionResult Login([FromBody] LoginDto dto)
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController(IOptions<AuthOptions> authOptions, IOptions<JwtOptions> jwtOptions) : ControllerBase
     {
-        // TODO: validar credenciales contra usuario real (DB / config / Identity)
-        var validUser = dto.Username == _config["Auth:Username"] && dto.Password == _config["Auth:Password"];
-        if (!validUser) return Unauthorized();
+        private readonly AuthOptions _authOptions = authOptions.Value;
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
-        // Generar token JWT
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        [HttpPost("login")]
+        public ActionResult Login([FromBody] LoginDto dto)
         {
+            if (dto is null ||
+                string.IsNullOrWhiteSpace(dto.Username) ||
+                string.IsNullOrWhiteSpace(dto.Password))
+            {
+                return BadRequest("Username and password are required.");
+            }
+
+            var validUser = dto.Username == _authOptions.Username &&
+                            dto.Password == _authOptions.Password;
+
+            if (!validUser)
+                return Unauthorized();
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
             new Claim(JwtRegisteredClaimNames.Sub, dto.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var token = new JwtSecurityToken(
-            issuer: _jwtOptions.Issuer,
-            audience: _jwtOptions.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes),
-            signingCredentials: creds
-        );
+            var token = new JwtSecurityToken(
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes),
+                signingCredentials: creds
+            );
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        return Ok(new { token = tokenString });
+            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+        }
     }
 }

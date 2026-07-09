@@ -22,6 +22,19 @@ namespace NotificationSystem.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Order>(entity =>
+               {
+                   entity.Property(o => o.CustomerName)
+                       .IsRequired()
+                       .HasMaxLength(200);
+
+                   entity.HasIndex(o => o.CreatedAt)
+                       .HasDatabaseName("IX_Orders_CreatedAt");
+
+                   entity.HasIndex(o => new { o.CreatedAt, o.Id })
+                       .HasDatabaseName("IX_Orders_CreatedAt_Id");
+               });
+
             // Configuración de la relación entre Order y NotificationAttempt
             // Aquí, se establece que un Order puede tener muchos NotificationAttempts,
             // y cada NotificationAttempt pertenece a un Order.
